@@ -27,9 +27,16 @@ void IRAM_ATTR RotaryEncoder::Process() {
     int currentStateCLK = digitalRead(CLK);
     if (currentStateCLK != lastStateCLK && currentStateCLK == HIGH) {
         if (digitalRead(DT) != currentStateCLK) {
-            value = (value >= max && loop) ? min : value + 1;
-        } else {
-            value = (value <= min && loop) ? max : value - 1;
+            if(value >= max) {
+                if (loop) value = min;
+            }
+            else value++;
+        }
+        else {           
+            if(value <= min) {
+                if (loop) value = max;
+            }
+            else value--;
         }
         updated = true;
     }
