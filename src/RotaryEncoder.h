@@ -14,12 +14,10 @@ class RotaryEncoder {
 		int value;
 		bool updated;
 
-		bool advconfig = false;
 		int min;
 		int max;
 		bool loop;
 	public:
-		RotaryEncoder(uint8_t _dt, uint8_t _clk);
 		RotaryEncoder(uint8_t _dt, uint8_t _clk, int _min, int _max, int _actual, bool _loop);
 		void Process();
 		uint8_t GetPinDT();
