@@ -1,20 +1,9 @@
 #include "RotaryEncoder.h"
 #include <Arduino.h>
 
-// Encoder 
-RotaryEncoder::RotaryEncoder(uint8_t _dt, uint8_t _clk) {
+RotaryEncoder::RotaryEncoder(uint8_t _dt, uint8_t _clk, int _min, int _max, int _actual, bool _loop) {   
     DT = _dt;
-	CLK = _clk;
-
-    pinMode(CLK, INPUT_PULLDOWN);
-    pinMode(DT,  INPUT_PULLDOWN);
-}
-
-RotaryEncoder::RotaryEncoder(uint8_t _dt, uint8_t _clk, int _min, int _max, int _actual, bool _loop) {
-	DT = _dt;
     CLK = _clk;
-
-    advconfig = true;
 
     min = _min;
     max = _max;
@@ -26,7 +15,6 @@ RotaryEncoder::RotaryEncoder(uint8_t _dt, uint8_t _clk, int _min, int _max, int 
     pinMode(DT,  INPUT_PULLDOWN);
 }
 
-
 uint8_t RotaryEncoder::GetPinDT() {
 	return DT;
 };
@@ -36,59 +24,24 @@ uint8_t RotaryEncoder::GetPinCLK() {
 };
 
 void IRAM_ATTR RotaryEncoder::Process() {
-    if(advconfig)
-    {
-        currentStateCLK = digitalRead(CLK);
-        if (currentStateCLK != lastStateCLK && currentStateCLK == 1)
-        {
-            if (digitalRead(DT) != currentStateCLK)
-            {
-                //ENCODER STEP UP
-                if(value >= max)
-                {
-                    if (loop) value = min;
-                }
-                else value++;
-            }
-            else
-            {           
-                //ENCODER STEP DOWN     
-                if(value <= min)
-                {
-                    if (loop) value = max;
-                }
-                else value--;
-            }
-            updated = true;
+    int currentStateCLK = digitalRead(CLK);
+    if (currentStateCLK != lastStateCLK && currentStateCLK == HIGH) {
+        if (digitalRead(DT) != currentStateCLK) {
+            value = (value >= max && loop) ? min : value + 1;
+        } else {
+            value = (value <= min && loop) ? max : value - 1;
         }
-        lastStateCLK = currentStateCLK;
+        updated = true;
     }
-    else
-    {
-        currentStateCLK = digitalRead(CLK);
-        if (currentStateCLK != lastStateCLK && currentStateCLK == 1)
-        {
-            if (digitalRead(DT) != currentStateCLK)
-            {
-            value++;
-            }
-            else
-            {
-            value--;
-            }
-            updated = true;
-        }
-        lastStateCLK = currentStateCLK;
-    }
+    lastStateCLK = currentStateCLK;
 };
 
 bool RotaryEncoder::Updated() {
-    if(updated)
-    {
+    if (updated) {
         updated = false;
         return true;
     }
-    else return false;
+    return false;
 };
 
 int RotaryEncoder::Value() {
