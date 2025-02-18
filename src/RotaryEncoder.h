@@ -8,7 +8,6 @@ class RotaryEncoder {
 		uint8_t DT;  
 		uint8_t CLK;  
 
-		bool currentStateCLK;
 		bool lastStateCLK;
 
 		int value;
